@@ -80,24 +80,53 @@
       width: 100%;
       max-width: 340px;
       display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chapter-info {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      min-height: 1.2em;
+    }
+
+    .progress-row {
+      width: 100%;
+      display: flex;
       align-items: center;
       gap: 12px;
     }
 
     .progress-track {
       flex: 1;
-      height: 4px;
-      border-radius: 2px;
+      height: 6px;
+      display: flex;
+      gap: 2px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .chapter-segment {
+      flex: 1;
+      height: 100%;
       background: var(--track);
+      border-radius: 3px;
+      position: relative;
       overflow: hidden;
     }
 
-    .progress-fill {
+    .chapter-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
       height: 100%;
-      width: 78%;
-      border-radius: 2px;
+      width: 0%;
       background: var(--fill);
-      transition: width 0.25s linear;
+      border-radius: 3px;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .time {
@@ -109,12 +138,132 @@
       text-align: right;
     }
 
+    /* Action Sheet */
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sheet-overlay.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 24px 24px 0 0;
+      padding: 12px 24px 44px;
+      z-index: 101;
+      transform: translateY(100%);
+      transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+      max-width: 500px;
+      left: 50%;
+      margin-left: -250px;
+    }
+
+    @media (max-width: 500px) {
+      .sheet {
+        left: 0;
+        margin-left: 0;
+        max-width: 100%;
+      }
+    }
+
+    .sheet.is-open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 5px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 2.5px;
+      margin: 0 auto 24px;
+    }
+
+    .sheet-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sheet-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .sheet-desc {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin: 0 0 24px;
+      line-height: 1.4;
+    }
+
+    .sheet-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn--primary {
+      background: var(--fill);
+      color: #fff;
+    }
+
+    .btn--secondary {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text);
+    }
+
+    .btn--tertiary {
+      background: transparent;
+      color: #007aff;
+      font-weight: 500;
+    }
+
     .controls {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 40px;
-      margin-top: 4px;
+      margin-top: 12px;
     }
 
     .ctrl {
@@ -182,69 +331,93 @@
     </div>
 
     <div class="progress-block">
-      <div class="progress-track" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-fill" id="progressFill"></div>
+      <div class="chapter-info" id="chapterLabel">Intelligent Systems</div>
+      <div class="progress-row">
+        <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Audio progress">
+          <!-- Chapters will be injected here -->
+        </div>
+        <span class="time" id="timeLabel">4:21</span>
       </div>
-      <span class="time" id="timeLabel">4:21</span>
-    </div>
-
-    <div class="controls">
-      <button type="button" class="ctrl ctrl--skip" id="skipBack" aria-label="Skip back 15 seconds">
-        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M22 9.5a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25Zm0 2.2a10.3 10.3 0 1 0 .01 20.6 10.3 10.3 0 0 0 0-20.6Z"
-            opacity=".35"
-          />
-          <path
-            fill="currentColor"
-            d="M22 11.2a10.8 10.8 0 0 1 7.8 18.3l-1.6-1.6a8.6 8.6 0 1 0-6.1-14.7V16h-2.2v-7h7v2.2h-4.9a8.6 8.6 0 0 1 7 3.7Z"
-          />
-          <text
-            x="22"
-            y="25.5"
-            text-anchor="middle"
-            font-size="10.5"
-            font-weight="700"
-            fill="currentColor"
-            font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
-          >15</text>
-        </svg>
-      </button>
-
-      <button type="button" class="ctrl ctrl--play is-paused" id="playPause" aria-label="Play">
-        <svg class="icon-play" width="28" height="28" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
-          <path d="M8 5.5v17L22 14 8 5.5z" />
-        </svg>
-        <svg class="icon-pause" width="28" height="28" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true" style="display:none">
-          <path d="M9 6h4v16H9V6zm6 0h4v16h-4V6z" />
-        </svg>
-      </button>
-
-      <button type="button" class="ctrl ctrl--skip" id="skipFwd" aria-label="Skip forward 30 seconds">
-        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M22 9.5a12.5 12.5 0 1 0 0 25 12.5 12.5 0 0 0 0-25Zm0 2.2a10.3 10.3 0 1 1 0 20.6 10.3 10.3 0 0 1 0-20.6Z"
-            opacity=".35"
-          />
-          <path
-            fill="currentColor"
-            d="M22 11.2a10.8 10.8 0 0 0-7.8 18.3l1.6-1.6a8.6 8.6 0 1 1 6.1-14.7V16h2.2v-7h-7v2.2h4.9a8.6 8.6 0 0 0-7 3.7Z"
-          />
-          <text
-            x="22"
-            y="25.5"
-            text-anchor="middle"
-            font-size="10.5"
-            font-weight="700"
-            fill="currentColor"
-            font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
-          >30</text>
-        </svg>
-      </button>
     </div>
   </main>
+
+  <div class="sheet-overlay" id="sheetOverlay"></div>
+  <div class="sheet" id="actionSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-content">
+      <h2 class="sheet-title" id="sheetTitle">Chapter Completed</h2>
+      <p class="sheet-desc" id="sheetDesc">You've finished "Intelligent Systems". Would you like to take action now or save it for later?</p>
+      
+      <div class="sheet-btns">
+        <button class="btn btn--primary" id="btnImmediate">
+          <span>Take Immediate Action</span>
+        </button>
+        <button class="btn btn--secondary" id="btnLater">
+          <span>Add to To-Do List</span>
+        </button>
+        <button class="btn btn--tertiary" id="btnDismiss">
+          <span>Just Continue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button type="button" class="ctrl ctrl--skip" id="skipBack" aria-label="Skip back 15 seconds">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M22 9.5a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25Zm0 2.2a10.3 10.3 0 1 0 .01 20.6 10.3 10.3 0 0 0 0-20.6Z"
+          opacity=".35"
+        />
+        <path
+          fill="currentColor"
+          d="M22 11.2a10.8 10.8 0 0 1 7.8 18.3l-1.6-1.6a8.6 8.6 0 1 0-6.1-14.7V16h-2.2v-7h7v2.2h-4.9a8.6 8.6 0 0 1 7 3.7Z"
+        />
+        <text
+          x="22"
+          y="25.5"
+          text-anchor="middle"
+          font-size="10.5"
+          font-weight="700"
+          fill="currentColor"
+          font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
+        >15</text>
+      </svg>
+    </button>
+
+    <button type="button" class="ctrl ctrl--play is-paused" id="playPause" aria-label="Play">
+      <svg class="icon-play" width="28" height="28" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
+        <path d="M8 5.5v17L22 14 8 5.5z" />
+      </svg>
+      <svg class="icon-pause" width="28" height="28" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true" style="display:none">
+        <path d="M9 6h4v16H9V6zm6 0h4v16h-4V6z" />
+      </svg>
+    </button>
+
+    <button type="button" class="ctrl ctrl--skip" id="skipFwd" aria-label="Skip forward 30 seconds">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M22 9.5a12.5 12.5 0 1 0 0 25 12.5 12.5 0 0 0 0-25Zm0 2.2a10.3 10.3 0 1 1 0 20.6 10.3 10.3 0 0 1 0-20.6Z"
+          opacity=".35"
+        />
+        <path
+          fill="currentColor"
+          d="M22 11.2a10.8 10.8 0 0 0-7.8 18.3l1.6-1.6a8.6 8.6 0 1 1 6.1-14.7V16h2.2v-7h-7v2.2h4.9a8.6 8.6 0 0 0-7 3.7Z"
+        />
+        <text
+          x="22"
+          y="25.5"
+          text-anchor="middle"
+          font-size="10.5"
+          font-weight="700"
+          fill="currentColor"
+          font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
+        >30</text>
+      </svg>
+    </button>
+  </div>
 
   <script>
     (function () {
@@ -337,17 +510,49 @@
     })();
 
     (function () {
-      const fill = document.getElementById("progressFill");
+      const track = document.getElementById("progressTrack");
+      const chapterLabel = document.getElementById("chapterLabel");
       const timeLabel = document.getElementById("timeLabel");
       const playBtn = document.getElementById("playPause");
       const iconPlay = playBtn.querySelector(".icon-play");
       const iconPause = playBtn.querySelector(".icon-pause");
+      
+      const sheet = document.getElementById("actionSheet");
+      const overlay = document.getElementById("sheetOverlay");
+      const btnImmediate = document.getElementById("btnImmediate");
+      const btnLater = document.getElementById("btnLater");
+      const btnDismiss = document.getElementById("btnDismiss");
 
-      const totalSec = 5 * 60 + 32;
-      let currentSec = (4 * 60 + 21);
+      const chapters = [
+        { start: 0, end: 90, name: "Intelligent Systems" },   // 1:30
+        { start: 90, end: 240, name: "Hypersolid Values" },  // 4:00
+        { start: 240, end: 332, name: "Future Outlook" }     // 5:32
+      ];
+
+      const totalSec = chapters[chapters.length - 1].end;
+      let currentSec = 0;
       let playing = false;
       let raf = 0;
       let last = 0;
+
+      // Initialize segments
+      const segmentFills = [];
+      track.innerHTML = "";
+      chapters.forEach((ch, i) => {
+        const seg = document.createElement("div");
+        seg.className = "chapter-segment";
+        const fill = document.createElement("div");
+        fill.className = "chapter-fill";
+        seg.appendChild(fill);
+        track.appendChild(seg);
+        segmentFills.push(fill);
+        
+        seg.addEventListener("click", (e) => {
+          e.stopPropagation();
+          currentSec = ch.start;
+          renderProgress();
+        });
+      });
 
       function fmt(sec) {
         const m = Math.floor(sec / 60);
@@ -356,32 +561,90 @@
       }
 
       function renderProgress() {
-        const p = Math.min(100, (currentSec / totalSec) * 100);
-        fill.style.width = p + "%";
+        const activeChapterIndex = chapters.findIndex(ch => currentSec >= ch.start && currentSec < ch.end);
+        
+        if (activeChapterIndex !== -1) {
+          chapterLabel.textContent = chapters[activeChapterIndex].name;
+        }
+
+        chapters.forEach((ch, i) => {
+          const fill = segmentFills[i];
+          if (currentSec >= ch.end) {
+            fill.style.width = "100%";
+          } else if (currentSec <= ch.start) {
+            fill.style.width = "0%";
+          } else {
+            const p = ((currentSec - ch.start) / (ch.end - ch.start)) * 100;
+            fill.style.width = p + "%";
+          }
+        });
+
         timeLabel.textContent = fmt(Math.min(currentSec, totalSec));
+      }
+
+      function showSheet(chapter) {
+        pause();
+        document.getElementById("sheetTitle").textContent = "Chapter Completed";
+        document.getElementById("sheetDesc").textContent = `You've finished "${chapter.name}". Would you like to take action now or save it for later?`;
+        sheet.classList.add("is-open");
+        overlay.classList.add("is-open");
+      }
+
+      function hideSheet() {
+        sheet.classList.remove("is-open");
+        overlay.classList.remove("is-open");
       }
 
       function tick(ts) {
         if (!last) last = ts;
         const dt = (ts - last) / 1000;
         last = ts;
+        
         if (playing) {
+          const prevSec = currentSec;
           currentSec = Math.min(totalSec, currentSec + dt);
           renderProgress();
+
+          chapters.forEach((ch, idx) => {
+            if (prevSec < ch.end && currentSec >= ch.end && idx < chapters.length - 1) {
+              showSheet(ch);
+            }
+          });
+
           if (currentSec >= totalSec) {
-            playing = false;
-            playBtn.classList.add("is-paused");
-            playBtn.setAttribute("aria-label", "Play");
-            iconPlay.style.display = "";
-            iconPause.style.display = "none";
-            cancelAnimationFrame(raf);
-            raf = 0;
-            last = 0;
+            pause();
             return;
           }
         }
         raf = requestAnimationFrame(tick);
       }
+
+      function play() {
+        playing = true;
+        playBtn.classList.remove("is-paused");
+        playBtn.setAttribute("aria-label", "Pause");
+        iconPlay.style.display = "none";
+        iconPause.style.display = "";
+        last = 0;
+        if (!raf) raf = requestAnimationFrame(tick);
+      }
+
+      function pause() {
+        playing = false;
+        playBtn.classList.add("is-paused");
+        playBtn.setAttribute("aria-label", "Play");
+        iconPlay.style.display = "";
+        iconPause.style.display = "none";
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+        last = 0;
+      }
+
+      playBtn.addEventListener("click", () => {
+        if (playing) pause(); else play();
+      });
 
       document.getElementById("skipBack").addEventListener("click", () => {
         currentSec = Math.max(0, currentSec - 15);
@@ -393,26 +656,25 @@
         renderProgress();
       });
 
-      playBtn.addEventListener("click", () => {
-        playing = !playing;
-        if (playing) {
-          playBtn.classList.remove("is-paused");
-          playBtn.setAttribute("aria-label", "Pause");
-          iconPlay.style.display = "none";
-          iconPause.style.display = "";
-          last = 0;
-          raf = requestAnimationFrame(tick);
-        } else {
-          playBtn.classList.add("is-paused");
-          playBtn.setAttribute("aria-label", "Play");
-          iconPlay.style.display = "";
-          iconPause.style.display = "none";
-          cancelAnimationFrame(raf);
-          raf = 0;
-          last = 0;
-        }
+      btnImmediate.addEventListener("click", () => {
+        hideSheet();
+        play();
       });
 
+      btnLater.addEventListener("click", () => {
+        hideSheet();
+        play();
+      });
+
+      btnDismiss.addEventListener("click", () => {
+        hideSheet();
+        play();
+      });
+
+      overlay.addEventListener("click", hideSheet);
+
+      // Demo start position
+      currentSec = 88;
       renderProgress();
     })();
   </script>
