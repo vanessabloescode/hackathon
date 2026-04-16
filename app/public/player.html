@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Daily Sparks – People at Hypersolid</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --track: #d2d2d7;
+      --fill: #1d1d1f;
+      --control-tint: #1d1d1f;
+      --play-circle: #1d1d1f;
+      --play-icon: #ffffff;
+      --streak-orange: #ff9500;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+        "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px 80px;
+    }
+
+    .player {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .title {
+      margin: 8px 0 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      text-align: center;
+      line-height: 1.2;
+      max-width: 320px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .streak {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: -12px;
+    }
+
+    .streak-flame {
+      width: 20px;
+      height: 20px;
+      color: var(--streak-orange);
+    }
+
+    .streak-count {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--streak-orange);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cover-wrap {
+      width: min(88vw, 320px);
+      aspect-ratio: 1;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.12),
+        0 4px 10px rgba(0, 0, 0, 0.08);
+      background: #0a1628;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    #cover {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .progress-block {
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chapter-info {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      min-height: 1.2em;
+    }
+
+    .progress-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 6px;
+      display: flex;
+      gap: 2px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .chapter-segment {
+      flex: 1;
+      height: 100%;
+      background: var(--track);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chapter-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--fill);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .time {
+      font-size: 0.75rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+      min-width: 2.8rem;
+      text-align: right;
+    }
+
+    /* Action Sheet */
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sheet-overlay.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 24px 24px 0 0;
+      padding: 12px 24px 44px;
+      z-index: 101;
+      transform: translateY(100%);
+      transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+      max-width: 500px;
+      left: 50%;
+      margin-left: -250px;
+    }
+
+    @media (max-width: 500px) {
+      .sheet {
+        left: 0;
+        margin-left: 0;
+        max-width: 100%;
+      }
+    }
+
+    .sheet.is-open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 5px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 2.5px;
+      margin: 0 auto 24px;
+    }
+
+    .sheet-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sheet-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .sheet-desc {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin: 0 0 24px;
+      line-height: 1.4;
+    }
+
+    .sheet-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn--primary {
+      background: var(--fill);
+      color: #fff;
+    }
+
+    .btn--secondary {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text);
+    }
+
+    .btn--tertiary {
+      background: transparent;
+      color: #007aff;
+      font-weight: 500;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin: 12px 0;
+      width: 100%;
+    }
+
+    .ctrl {
+      border: none;
+      background: transparent;
+      padding: 12px;
+      cursor: pointer;
+      color: var(--text);
+      border-radius: 50%;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ctrl:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .ctrl:active {
+      transform: scale(0.92);
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .ctrl:focus-visible {
+      outline: 2px solid #007aff;
+      outline-offset: 2px;
+    }
+
+    .ctrl--skip {
+      color: var(--text);
+    }
+
+    .ctrl--skip svg {
+      display: block;
+      width: 38px;
+      height: 38px;
+    }
+
+    .ctrl--play {
+      width: 68px;
+      height: 68px;
+      padding: 0;
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .ctrl--play:hover {
+       background: #000;
+       transform: scale(1.02);
+       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .ctrl--play:active {
+      transform: scale(0.96);
+    }
+
+    .ctrl--play svg {
+      display: block;
+      width: 32px;
+      height: 32px;
+    }
+
+    .ctrl--play .icon-play {
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <main class="player" aria-label="Podcast player">
+    <div class="streak">
+      <svg class="streak-flame" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2c0 0-3 3-3 7s3 7 3 7 3-3 3-7-3-7-3-7z" opacity="0.2"/>
+        <path d="M17.5 11c0 3.037-2.463 5.5-5.5 5.5S6.5 14.037 6.5 11c0-2.037 1.463-4.5 3.5-5.5.5 1.5 1.5 2.5 2 2.5s1.5-1 2-2.5c2.037 1 3.5 3.463 3.5 5.5z" />
+        <path d="M12 18c-3.314 0-6-2.686-6-6 0-1.657.672-3.314 1.757-4.5.5 1.5 1.5 2.5 2.243 2.5s1.5-1 2.243-2.5c1.085 1.186 1.757 2.843 1.757 4.5 0 3.314-2.686 6-6 6z" opacity="0.6"/>
+      </svg>
+      <span class="streak-count">12</span>
+    </div>
+
+    <div class="cover-wrap">
+      <img id="cover" src="campfire.png" alt="3D Refined Campfire">
+    </div>
+
+    <div class="metadata">
+      <h1 class="title">Daily Sparks</h1>
+      <p class="subtitle">People at Hypersolid</p>
+    </div>
+
+    <div class="controls">
+      <button type="button" class="ctrl ctrl--skip" id="skipBack" aria-label="Skip back 15 seconds">
+        <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M22 9.5a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25Zm0 2.2a10.3 10.3 0 1 0 .01 20.6 10.3 10.3 0 0 0 0-20.6Z"
+            opacity=".35"
+          />
+          <path
+            fill="currentColor"
+            d="M22 11.2a10.8 10.8 0 0 1 7.8 18.3l-1.6-1.6a8.6 8.6 0 1 0-6.1-14.7V16h-2.2v-7h7v2.2h-4.9a8.6 8.6 0 0 1 7 3.7Z"
+          />
+          <text
+            x="22"
+            y="25.5"
+            text-anchor="middle"
+            font-size="10"
+            font-weight="700"
+            fill="currentColor"
+            style="font-family: -apple-system, sans-serif;"
+          >15</text>
+        </svg>
+      </button>
+
+      <button type="button" class="ctrl ctrl--play is-paused" id="playPause" aria-label="Play">
+        <svg class="icon-play" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
+          <path d="M8 5.5v17L22 14 8 5.5z" />
+        </svg>
+        <svg class="icon-pause" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true" style="display:none">
+          <path d="M9 6h4v16H9V6zm6 0h4v16h-4V6z" />
+        </svg>
+      </button>
+
+      <button type="button" class="ctrl ctrl--skip" id="skipFwd" aria-label="Skip forward 30 seconds">
+        <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M22 9.5a12.5 12.5 0 1 0 0 25 12.5 12.5 0 0 0 0-25Zm0 2.2a10.3 10.3 0 1 1 0 20.6 10.3 10.3 0 0 1 0-20.6Z"
+            opacity=".35"
+          />
+          <path
+            fill="currentColor"
+            d="M22 11.2a10.8 10.8 0 0 0-7.8 18.3l1.6-1.6a8.6 8.6 0 1 1 6.1-14.7V16h2.2v-7h-7v2.2h4.9a8.6 8.6 0 0 0-7 3.7Z"
+          />
+          <text
+            x="22"
+            y="25.5"
+            text-anchor="middle"
+            font-size="10"
+            font-weight="700"
+            fill="currentColor"
+            style="font-family: -apple-system, sans-serif;"
+          >30</text>
+        </svg>
+      </button>
+    </div>
+
+    <div class="progress-block">
+      <div class="chapter-info" id="chapterLabel">Intelligent Systems</div>
+      <div class="progress-row">
+        <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Audio progress">
+          <!-- Chapters will be injected here -->
+        </div>
+        <span class="time" id="timeLabel">1:21</span>
+      </div>
+    </div>
+  </main>
+
+  <div class="sheet-overlay" id="sheetOverlay"></div>
+  <div class="sheet" id="actionSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-content">
+      <h2 class="sheet-title" id="sheetTitle">Chapter Completed</h2>
+      <p class="sheet-desc" id="sheetDesc">You've finished "Intelligent Systems". Would you like to take action now or save it for later?</p>
+      
+      <div class="sheet-btns">
+        <button class="btn btn--primary" id="btnImmediate">
+          <span>Take Immediate Action</span>
+        </button>
+        <button class="btn btn--secondary" id="btnLater">
+          <span>Add to To-Do List</span>
+        </button>
+        <button class="btn btn--tertiary" id="btnDismiss">
+          <span>Just Continue</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+    (function () {
+      const track = document.getElementById("progressTrack");
+      const chapterLabel = document.getElementById("chapterLabel");
+      const timeLabel = document.getElementById("timeLabel");
+      const playBtn = document.getElementById("playPause");
+      const iconPlay = playBtn.querySelector(".icon-play");
+      const iconPause = playBtn.querySelector(".icon-pause");
+      
+      const sheet = document.getElementById("actionSheet");
+      const overlay = document.getElementById("sheetOverlay");
+      const btnImmediate = document.getElementById("btnImmediate");
+      const btnLater = document.getElementById("btnLater");
+      const btnDismiss = document.getElementById("btnDismiss");
+
+      const chapters = [
+        { start: 0, end: 90, name: "Anniversaries" },
+        { start: 90, end: 240, name: "New Hires" },
+        { start: 240, end: 332, name: "People Q&A" }
+      ];
+
+      const totalSec = chapters[chapters.length - 1].end;
+      let currentSec = 0;
+      let playing = false;
+      let raf = 0;
+      let last = 0;
+
+      // Initialize segments
+      const segmentFills = [];
+      track.innerHTML = "";
+      chapters.forEach((ch, i) => {
+        const seg = document.createElement("div");
+        seg.className = "chapter-segment";
+        const fill = document.createElement("div");
+        fill.className = "chapter-fill";
+        seg.appendChild(fill);
+        track.appendChild(seg);
+        segmentFills.push(fill);
+        
+        seg.addEventListener("click", (e) => {
+          e.stopPropagation();
+          currentSec = ch.start;
+          renderProgress();
+        });
+      });
+
+      function fmt(sec) {
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return m + ":" + (s < 10 ? "0" : "") + s;
+      }
+
+      function renderProgress() {
+        const activeChapterIndex = chapters.findIndex(ch => currentSec >= ch.start && currentSec < ch.end);
+        
+        if (activeChapterIndex !== -1) {
+          chapterLabel.textContent = chapters[activeChapterIndex].name;
+        }
+
+        chapters.forEach((ch, i) => {
+          const fill = segmentFills[i];
+          if (currentSec >= ch.end) {
+            fill.style.width = "100%";
+          } else if (currentSec <= ch.start) {
+            fill.style.width = "0%";
+          } else {
+            const p = ((currentSec - ch.start) / (ch.end - ch.start)) * 100;
+            fill.style.width = p + "%";
+          }
+        });
+
+        timeLabel.textContent = fmt(Math.min(currentSec, totalSec));
+      }
+
+      function showSheet(chapter) {
+        pause();
+        document.getElementById("sheetTitle").textContent = "Chapter Completed";
+        document.getElementById("sheetDesc").textContent = `You've finished "${chapter.name}". Would you like to take action now or save it for later?`;
+        sheet.classList.add("is-open");
+        overlay.classList.add("is-open");
+      }
+
+      function hideSheet() {
+        sheet.classList.remove("is-open");
+        overlay.classList.remove("is-open");
+      }
+
+      function tick(ts) {
+        if (!last) last = ts;
+        const dt = (ts - last) / 1000;
+        last = ts;
+        
+        if (playing) {
+          const prevSec = currentSec;
+          currentSec = Math.min(totalSec, currentSec + dt);
+          renderProgress();
+
+          chapters.forEach((ch, idx) => {
+            if (prevSec < ch.end && currentSec >= ch.end && idx < chapters.length - 1) {
+              showSheet(ch);
+            }
+          });
+
+          if (currentSec >= totalSec) {
+            pause();
+            return;
+          }
+        }
+        raf = requestAnimationFrame(tick);
+      }
+
+      function play() {
+        playing = true;
+        playBtn.classList.remove("is-paused");
+        playBtn.setAttribute("aria-label", "Pause");
+        iconPlay.style.display = "none";
+        iconPause.style.display = "";
+        last = 0;
+        if (!raf) raf = requestAnimationFrame(tick);
+      }
+
+      function pause() {
+        playing = false;
+        playBtn.classList.add("is-paused");
+        playBtn.setAttribute("aria-label", "Play");
+        iconPlay.style.display = "";
+        iconPause.style.display = "none";
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+        last = 0;
+      }
+
+      playBtn.addEventListener("click", () => {
+        if (playing) pause(); else play();
+      });
+
+      document.getElementById("skipBack").addEventListener("click", () => {
+        currentSec = Math.max(0, currentSec - 15);
+        renderProgress();
+      });
+
+      document.getElementById("skipFwd").addEventListener("click", () => {
+        currentSec = Math.min(totalSec, currentSec + 30);
+        renderProgress();
+      });
+
+      btnImmediate.addEventListener("click", () => {
+        hideSheet();
+        play();
+      });
+
+      btnLater.addEventListener("click", () => {
+        hideSheet();
+        play();
+      });
+
+      btnDismiss.addEventListener("click", () => {
+        hideSheet();
+        play();
+      });
+
+      overlay.addEventListener("click", hideSheet);
+
+      // Demo start position
+      currentSec = 88;
+      renderProgress();
+    })();
+  </script>
+</body>
+</html>
