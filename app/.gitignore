@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# Copied from repo root on predev/prebuild (npm run sync:html)
+/public/index.html
+
 # production
 /build
 
