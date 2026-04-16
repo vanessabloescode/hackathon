@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "sync:html": "cp ../index.html public/index.html",
+    "sync:html": "cp ../index.html public/player.html && cp ../campfire.png public/campfire.png",
     "predev": "npm run sync:html",
     "prebuild": "npm run sync:html",
     "dev": "npx next dev",
