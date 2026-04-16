@@ -1,4 +1,4 @@
 {
-  "buildCommand": "npm run build --prefix app",
-  "outputDirectory": "app/out"
+  "buildCommand": "npm run build --prefix app && cp -r app/out ./public",
+  "outputDirectory": "public"
 }
