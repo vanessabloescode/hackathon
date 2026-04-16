@@ -14,6 +14,7 @@
       --control-tint: #1d1d1f;
       --play-circle: #1d1d1f;
       --play-icon: #ffffff;
+      --streak-orange: #ff9500;
     }
 
     * {
@@ -48,32 +49,65 @@
     }
 
     .title {
-      margin: 0;
-      font-size: 1.0625rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
+      margin: 8px 0 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
       text-align: center;
-      line-height: 1.25;
+      line-height: 1.2;
       max-width: 320px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .streak {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: -12px;
+    }
+
+    .streak-flame {
+      width: 20px;
+      height: 20px;
+      color: var(--streak-orange);
+    }
+
+    .streak-count {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--streak-orange);
+      font-variant-numeric: tabular-nums;
     }
 
     .cover-wrap {
       width: min(88vw, 320px);
       aspect-ratio: 1;
-      border-radius: 22px;
+      border-radius: 28px;
       overflow: hidden;
       box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.06),
-        0 8px 24px rgba(0, 0, 0, 0.08);
+        0 10px 30px rgba(0, 0, 0, 0.12),
+        0 4px 10px rgba(0, 0, 0, 0.08);
       background: #0a1628;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     #cover {
       display: block;
       width: 100%;
       height: 100%;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
+      object-fit: cover;
     }
 
     .progress-block {
@@ -134,7 +168,7 @@
       font-weight: 500;
       font-variant-numeric: tabular-nums;
       color: var(--text-secondary);
-      min-width: 2.5rem;
+      min-width: 2.8rem;
       text-align: right;
     }
 
@@ -262,8 +296,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 40px;
-      margin-top: 12px;
+      gap: 32px;
+      margin: 12px 0;
+      width: 100%;
     }
 
     .ctrl {
@@ -271,18 +306,22 @@
       background: transparent;
       padding: 12px;
       cursor: pointer;
-      color: var(--control-tint);
+      color: var(--text);
       border-radius: 50%;
-      transition: opacity 0.15s ease, transform 0.12s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .ctrl:hover {
-      opacity: 0.85;
+      background: rgba(0, 0, 0, 0.04);
     }
 
     .ctrl:active {
-      transform: scale(0.94);
+      transform: scale(0.92);
+      background: rgba(0, 0, 0, 0.08);
     }
 
     .ctrl:focus-visible {
@@ -291,43 +330,120 @@
     }
 
     .ctrl--skip {
-      color: var(--control-tint);
+      color: var(--text);
     }
 
     .ctrl--skip svg {
       display: block;
+      width: 38px;
+      height: 38px;
     }
 
     .ctrl--play {
-      width: 72px;
-      height: 72px;
+      width: 68px;
+      height: 68px;
       padding: 0;
-      background: var(--play-circle);
-      color: var(--play-icon);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      background: var(--text);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
 
     .ctrl--play:hover {
-      opacity: 1;
-      filter: brightness(1.08);
+       background: #000;
+       transform: scale(1.02);
+       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .ctrl--play:active {
+      transform: scale(0.96);
     }
 
     .ctrl--play svg {
       display: block;
-      margin-left: 3px;
+      width: 32px;
+      height: 32px;
     }
 
-    .ctrl--play.is-paused svg {
+    .ctrl--play .icon-play {
       margin-left: 4px;
     }
   </style>
 </head>
 <body>
   <main class="player" aria-label="Podcast player">
-    <h1 class="title">Daily Sparks – People at Hypersolid</h1>
+    <div class="streak">
+      <svg class="streak-flame" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2c0 0-3 3-3 7s3 7 3 7 3-3 3-7-3-7-3-7z" opacity="0.2"/>
+        <path d="M17.5 11c0 3.037-2.463 5.5-5.5 5.5S6.5 14.037 6.5 11c0-2.037 1.463-4.5 3.5-5.5.5 1.5 1.5 2.5 2 2.5s1.5-1 2-2.5c2.037 1 3.5 3.463 3.5 5.5z" />
+        <path d="M12 18c-3.314 0-6-2.686-6-6 0-1.657.672-3.314 1.757-4.5.5 1.5 1.5 2.5 2.243 2.5s1.5-1 2.243-2.5c1.085 1.186 1.757 2.843 1.757 4.5 0 3.314-2.686 6-6 6z" opacity="0.6"/>
+      </svg>
+      <span class="streak-count">12</span>
+    </div>
 
     <div class="cover-wrap">
-      <canvas id="cover" width="64" height="64" aria-label="Animated pixel art campfire cover"></canvas>
+      <img id="cover" src="campfire.png" alt="3D Refined Campfire">
+    </div>
+
+    <div class="metadata">
+      <h1 class="title">Daily Sparks</h1>
+      <p class="subtitle">People at Hypersolid</p>
+    </div>
+
+    <div class="controls">
+      <button type="button" class="ctrl ctrl--skip" id="skipBack" aria-label="Skip back 15 seconds">
+        <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M22 9.5a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25Zm0 2.2a10.3 10.3 0 1 0 .01 20.6 10.3 10.3 0 0 0 0-20.6Z"
+            opacity=".35"
+          />
+          <path
+            fill="currentColor"
+            d="M22 11.2a10.8 10.8 0 0 1 7.8 18.3l-1.6-1.6a8.6 8.6 0 1 0-6.1-14.7V16h-2.2v-7h7v2.2h-4.9a8.6 8.6 0 0 1 7 3.7Z"
+          />
+          <text
+            x="22"
+            y="25.5"
+            text-anchor="middle"
+            font-size="10"
+            font-weight="700"
+            fill="currentColor"
+            style="font-family: -apple-system, sans-serif;"
+          >15</text>
+        </svg>
+      </button>
+
+      <button type="button" class="ctrl ctrl--play is-paused" id="playPause" aria-label="Play">
+        <svg class="icon-play" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
+          <path d="M8 5.5v17L22 14 8 5.5z" />
+        </svg>
+        <svg class="icon-pause" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true" style="display:none">
+          <path d="M9 6h4v16H9V6zm6 0h4v16h-4V6z" />
+        </svg>
+      </button>
+
+      <button type="button" class="ctrl ctrl--skip" id="skipFwd" aria-label="Skip forward 30 seconds">
+        <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M22 9.5a12.5 12.5 0 1 0 0 25 12.5 12.5 0 0 0 0-25Zm0 2.2a10.3 10.3 0 1 1 0 20.6 10.3 10.3 0 0 1 0-20.6Z"
+            opacity=".35"
+          />
+          <path
+            fill="currentColor"
+            d="M22 11.2a10.8 10.8 0 0 0-7.8 18.3l1.6-1.6a8.6 8.6 0 1 1 6.1-14.7V16h2.2v-7h-7v2.2h4.9a8.6 8.6 0 0 0-7 3.7Z"
+          />
+          <text
+            x="22"
+            y="25.5"
+            text-anchor="middle"
+            font-size="10"
+            font-weight="700"
+            fill="currentColor"
+            style="font-family: -apple-system, sans-serif;"
+          >30</text>
+        </svg>
+      </button>
     </div>
 
     <div class="progress-block">
@@ -336,7 +452,7 @@
         <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Audio progress">
           <!-- Chapters will be injected here -->
         </div>
-        <span class="time" id="timeLabel">4:21</span>
+        <span class="time" id="timeLabel">1:21</span>
       </div>
     </div>
   </main>
@@ -362,152 +478,8 @@
     </div>
   </div>
 
-  <div class="controls">
-    <button type="button" class="ctrl ctrl--skip" id="skipBack" aria-label="Skip back 15 seconds">
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M22 9.5a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25Zm0 2.2a10.3 10.3 0 1 0 .01 20.6 10.3 10.3 0 0 0 0-20.6Z"
-          opacity=".35"
-        />
-        <path
-          fill="currentColor"
-          d="M22 11.2a10.8 10.8 0 0 1 7.8 18.3l-1.6-1.6a8.6 8.6 0 1 0-6.1-14.7V16h-2.2v-7h7v2.2h-4.9a8.6 8.6 0 0 1 7 3.7Z"
-        />
-        <text
-          x="22"
-          y="25.5"
-          text-anchor="middle"
-          font-size="10.5"
-          font-weight="700"
-          fill="currentColor"
-          font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
-        >15</text>
-      </svg>
-    </button>
-
-    <button type="button" class="ctrl ctrl--play is-paused" id="playPause" aria-label="Play">
-      <svg class="icon-play" width="28" height="28" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
-        <path d="M8 5.5v17L22 14 8 5.5z" />
-      </svg>
-      <svg class="icon-pause" width="28" height="28" viewBox="0 0 28 28" fill="currentColor" aria-hidden="true" style="display:none">
-        <path d="M9 6h4v16H9V6zm6 0h4v16h-4V6z" />
-      </svg>
-    </button>
-
-    <button type="button" class="ctrl ctrl--skip" id="skipFwd" aria-label="Skip forward 30 seconds">
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M22 9.5a12.5 12.5 0 1 0 0 25 12.5 12.5 0 0 0 0-25Zm0 2.2a10.3 10.3 0 1 1 0 20.6 10.3 10.3 0 0 1 0-20.6Z"
-          opacity=".35"
-        />
-        <path
-          fill="currentColor"
-          d="M22 11.2a10.8 10.8 0 0 0-7.8 18.3l1.6-1.6a8.6 8.6 0 1 1 6.1-14.7V16h2.2v-7h-7v2.2h4.9a8.6 8.6 0 0 0-7 3.7Z"
-        />
-        <text
-          x="22"
-          y="25.5"
-          text-anchor="middle"
-          font-size="10.5"
-          font-weight="700"
-          fill="currentColor"
-          font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif"
-        >30</text>
-      </svg>
-    </button>
-  </div>
 
   <script>
-    (function () {
-      const canvas = document.getElementById("cover");
-      const wrap = canvas.parentElement;
-      const ctx = canvas.getContext("2d");
-      const logical = 64;
-      function resize() {
-        const css = wrap.clientWidth;
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
-        canvas.style.width = css + "px";
-        canvas.style.height = css + "px";
-        canvas.width = Math.round(logical * dpr);
-        canvas.height = Math.round(logical * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-      resize();
-      window.addEventListener("resize", resize);
-      if (typeof ResizeObserver !== "undefined") {
-        new ResizeObserver(() => resize()).observe(wrap);
-      }
-      const W = logical;
-      const H = logical;
-
-      const navy = "#0a1628";
-      const log = "#5c3d2e";
-      const logDark = "#3d281c";
-      const flameCore = "#ffcc00";
-      const flameMid = "#ff8800";
-      const flameOut = "#ff4400";
-      const spark = "#ffaa44";
-
-      function rect(x, y, w, h, c) {
-        ctx.fillStyle = c;
-        ctx.fillRect(x, y, w, h);
-      }
-
-      const sparks = [];
-      for (let i = 0; i < 8; i++) {
-        sparks.push({
-          x: 28 + (Math.random() * 16 - 8),
-          y: 28 + Math.random() * 8,
-          vy: 0.15 + Math.random() * 0.25,
-          life: Math.random(),
-        });
-      }
-
-      let t = 0;
-
-      function drawFrame() {
-        t += 1;
-        const flicker = Math.sin(t * 0.12) * 0.5 + Math.sin(t * 0.23) * 0.3;
-
-        ctx.fillStyle = navy;
-        ctx.fillRect(0, 0, W, H);
-
-        rect(26, 40, 14, 6, logDark);
-        rect(24, 42, 18, 4, log);
-        rect(30, 22, 6, 22, logDark);
-        rect(28, 24, 10, 18, log);
-
-        const fh = 3 + Math.floor(flicker);
-        rect(30, 36 - fh, 4, fh + 4, flameOut);
-        rect(29, 35 - fh, 6, fh + 5, flameMid);
-        rect(30, 34 - fh, 4, fh + 4, flameCore);
-        rect(27, 38 - fh, 2, 3, flameMid);
-        rect(35, 37 - fh, 2, 3, flameMid);
-
-        for (const s of sparks) {
-          s.y -= s.vy;
-          s.life += 0.04;
-          if (s.y < 10 || s.life > 1) {
-            s.x = 28 + (Math.random() * 14 - 7);
-            s.y = 30 + Math.random() * 4;
-            s.vy = 0.12 + Math.random() * 0.2;
-            s.life = 0;
-          }
-          const a = 0.4 + Math.sin(s.life * Math.PI) * 0.6;
-          ctx.globalAlpha = a;
-          rect(Math.floor(s.x), Math.floor(s.y), 1, 1, spark);
-          ctx.globalAlpha = 1;
-        }
-      }
-
-      function loop() {
-        drawFrame();
-        requestAnimationFrame(loop);
-      }
-      requestAnimationFrame(loop);
-    })();
 
     (function () {
       const track = document.getElementById("progressTrack");
@@ -524,9 +496,9 @@
       const btnDismiss = document.getElementById("btnDismiss");
 
       const chapters = [
-        { start: 0, end: 90, name: "Intelligent Systems" },   // 1:30
-        { start: 90, end: 240, name: "Hypersolid Values" },  // 4:00
-        { start: 240, end: 332, name: "Future Outlook" }     // 5:32
+        { start: 0, end: 90, name: "Anniversaries" },
+        { start: 90, end: 240, name: "New Hires" },
+        { start: 240, end: 332, name: "People Q&A" }
       ];
 
       const totalSec = chapters[chapters.length - 1].end;
