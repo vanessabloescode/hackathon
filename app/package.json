@@ -6,10 +6,10 @@
     "sync:html": "cp ../index.html public/index.html",
     "predev": "npm run sync:html",
     "prebuild": "npm run sync:html",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "npx next dev",
+    "build": "npx next build",
+    "start": "npx next start",
+    "lint": "npx eslint"
   },
   "dependencies": {
     "next": "16.2.4",
