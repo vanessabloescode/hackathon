@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hackathon",
-  description: "Bold. Minimal. Built for what's next.",
+  title: "Daily Sparks – People at Hypersolid",
+  description: "Podcast player",
 };
 
 export default function RootLayout({

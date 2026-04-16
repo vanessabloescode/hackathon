@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "sync:html": "cp ../index.html public/index.html",
+    "predev": "npm run sync:html",
+    "prebuild": "npm run sync:html",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
